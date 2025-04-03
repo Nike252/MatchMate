@@ -1,0 +1,391 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('MatchMate Admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        /* Website Color Scheme */
+        --primary: #FF69B4;
+        --secondary: #FF1493;
+        --accent: #FFB6C1;
+        --primary-fg: #ffffff;
+        --body-fg: #f1f5f9;
+        --body-bg: #0f172a;
+        --body-quiet-color: #94a3b8;
+        --body-loud-color: #f8fafc;
+        --header-color: #ffffff;
+        --header-branding-color: var(--primary);
+        --header-bg: #1e293b;
+        --header-link-color: var(--primary-fg);
+        --header-link-hover-color: var(--accent);
+        --breadcrumbs-fg: var(--body-quiet-color);
+        --breadcrumbs-link-fg: var(--body-loud-color);
+        --breadcrumbs-bg: #1e293b;
+        --link-fg: var(--accent);
+        --link-hover-color: var(--primary);
+        --link-selected-fg: var(--primary);
+        --hairline-color: #334155;
+        --border-color: #334155;
+        --error-fg: #ef4444;
+        --message-success-bg: #064e3b;
+        --message-success-border-color: #065f46;
+        --message-success-fg: #6ee7b7;
+        --message-warning-bg: #78350f;
+        --message-warning-border-color: #92400e;
+        --message-warning-fg: #fbbf24;
+        --message-error-bg: #7f1d1d;
+        --message-error-border-color: #991b1b;
+        --message-error-fg: #fca5a5;
+        --darkened-bg: #1e293b;
+        --selected-bg: #334155;
+        --selected-row-bg: #1e40af;
+        --button-hover-bg: var(--secondary);
+        --button-fg: #ffffff;
+        --default-button-bg: var(--primary);
+        --default-button-hover-bg: var(--secondary);
+        --secondary-button-bg: var(--darkened-bg);
+        --secondary-button-hover-bg: var(--selected-bg);
+        --delete-button-bg: #dc2626;
+        --delete-button-hover-bg: #b91c1c;
+        --object-tools-fg: var(--button-fg);
+        --object-tools-bg: var(--delete-button-bg);
+        --object-tools-hover-bg: var(--delete-button-hover-bg);
+    }
+
+    /* Modern Glassmorphism Effect */
+    .module, .dashboard .module {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        margin-bottom: 24px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .module:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modern Header Styling */
+    #header {
+        background: linear-gradient(135deg, var(--header-bg), #0f172a);
+        color: var(--header-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    #header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255, 105, 180, 0.1), rgba(255, 20, 147, 0.1));
+        pointer-events: none;
+    }
+
+    #branding h1 {
+        color: var(--header-color);
+        font-weight: 700;
+        font-size: 1.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Enhanced Module Headers */
+    .module h2, .module caption, .inline-group h2 {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: var(--header-color);
+        padding: 16px 20px;
+        font-weight: 600;
+        border-radius: 16px 16px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .module h2::after, .module caption::after, .inline-group h2::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+        pointer-events: none;
+    }
+
+    /* Modern Breadcrumbs */
+    div.breadcrumbs {
+        background: var(--breadcrumbs-bg);
+        color: var(--breadcrumbs-fg);
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Enhanced Buttons */
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: var(--default-button-bg);
+        color: var(--button-fg);
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .button::before, input[type=submit]::before, input[type=button]::before, .submit-row input::before, a.button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .button:hover::before, input[type=submit]:hover::before, input[type=button]:hover::before, .submit-row input:hover::before, a.button:hover::before {
+        opacity: 1;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: var(--button-hover-bg);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Modern Tables */
+    .results {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    thead th {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: var(--header-color);
+        font-weight: 600;
+        padding: 16px 20px;
+        position: relative;
+    }
+
+    thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    tbody td {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background: var(--selected-row-bg);
+        transition: all 0.3s ease;
+    }
+
+    /* Enhanced Form Elements */
+    input[type=text], input[type=password], input[type=email], textarea, select {
+        background: rgba(30, 41, 59, 0.8);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--body-fg);
+        padding: 12px 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+    }
+
+    input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, textarea:focus, select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.2);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    /* Modern Login Page */
+    .login #header {
+        background: linear-gradient(135deg, var(--header-bg), #0f172a);
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .login #container {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        padding: 32px;
+        max-width: 400px;
+        margin: 40px auto;
+    }
+
+    .login .form-row {
+        padding: 16px 0;
+    }
+
+    .login .form-row input {
+        width: 100%;
+        padding: 14px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--body-fg);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1rem;
+    }
+
+    .login .submit-row {
+        padding: 32px 0 0;
+    }
+
+    .login .submit-row input {
+        width: 100%;
+        padding: 14px;
+        background: var(--default-button-bg);
+        color: var(--button-fg);
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .login .submit-row input:hover {
+        background: var(--button-hover-bg);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Enhanced Dashboard */
+    .dashboard .module table {
+        width: 100%;
+    }
+
+    .dashboard .module table th {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: var(--header-color);
+        padding: 16px 20px;
+        font-weight: 600;
+    }
+
+    .dashboard .module table td {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Modern Messages */
+    .messagelist li {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .messagelist li:hover {
+        transform: translateX(4px);
+    }
+
+    .messagelist li.success {
+        background: var(--message-success-bg);
+        border-color: var(--message-success-border-color);
+        color: var(--message-success-fg);
+    }
+
+    .messagelist li.warning {
+        background: var(--message-warning-bg);
+        border-color: var(--message-warning-border-color);
+        color: var(--message-warning-fg);
+    }
+
+    .messagelist li.error {
+        background: var(--message-error-bg);
+        border-color: var(--message-error-border-color);
+        color: var(--message-error-fg);
+    }
+
+    /* Enhanced Object Tools */
+    .object-tools {
+        background: var(--object-tools-bg);
+        border-radius: 12px;
+        padding: 6px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .object-tools a:hover {
+        background: var(--object-tools-hover-bg);
+        transform: translateY(-1px);
+    }
+
+    /* Modern Navigation */
+    #nav-sidebar {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    #nav-sidebar a {
+        color: var(--body-fg);
+        padding: 12px 16px;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    #nav-sidebar a:hover {
+        background: var(--selected-bg);
+        color: var(--primary);
+        transform: translateX(4px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        #container {
+            padding: 20px;
+        }
+        
+        .module {
+            margin-bottom: 20px;
+        }
+
+        .login #container {
+            margin: 20px;
+            padding: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <span style="color: var(--accent);">Match</span>Mate Admin
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %} 
